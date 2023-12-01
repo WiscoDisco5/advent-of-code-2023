@@ -1,13 +1,14 @@
 import re
 
-doc = """1abc2
+# Sample data
+sample_doc = """1abc2
 pqr3stu8vwx
 a1b2c3d4e5f
 treb7uchet
 """
 
 
-def numbers(doc: str):
+def extract_sum(doc: str):
     strings = doc.splitlines()
     numbers = []
     for string in strings:
@@ -16,9 +17,10 @@ def numbers(doc: str):
     return sum(numbers)
 
 
-numbers(doc)
+extract_sum(sample_doc)
 
+# Actual data
 with open("2023-12-01.txt") as file:
-    doc = file.read()
+    actual_doc = file.read()
 
-numbers(doc)
+extract_sum(actual_doc)
