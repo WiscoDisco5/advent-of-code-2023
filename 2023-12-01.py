@@ -1,12 +1,5 @@
 import re
 
-# Sample data
-sample_doc = """1abc2
-pqr3stu8vwx
-a1b2c3d4e5f
-treb7uchet
-"""
-
 
 def extract_sum(doc: str):
     strings = doc.splitlines()
@@ -16,6 +9,13 @@ def extract_sum(doc: str):
         numbers.append(int(num_str[0] + num_str[-1]))
     return sum(numbers)
 
+
+# Sample data
+sample_doc = """1abc2
+pqr3stu8vwx
+a1b2c3d4e5f
+treb7uchet
+"""
 
 extract_sum(sample_doc)
 
