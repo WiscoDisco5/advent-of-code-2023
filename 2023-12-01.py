@@ -17,7 +17,7 @@ a1b2c3d4e5f
 treb7uchet
 """
 
-extract_sum(sample_doc)
+assert extract_sum(sample_doc) == 142
 
 # Actual data
 with open("2023-12-01.txt") as file:
