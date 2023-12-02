@@ -1,6 +1,8 @@
 import re
 from dataclasses import dataclass
 
+from numpy import prod
+
 KEY = {
     "red": 12,
     "green": 13,
@@ -28,23 +30,36 @@ class Draw:
 @dataclass
 class Game:
     id: int
-    draws: list[list[Draw]]
+    draws: list[Draw]
 
     @classmethod
     def from_string(cls, string: str):
         _id = string.split(":")[0].split(" ")[-1]
         _raw_draws = string.split(": ")[-1].split("; ")
         _temp_draws = [draw.split(", ") for draw in _raw_draws]
-        _draws = [[Draw.from_string(obs) for obs in draw] for draw in _temp_draws]
+        # Observation: it doesn't matter what set a particular observation of a certain
+        # color occurs in.
+        _draws = [Draw.from_string(obs) for draw in _temp_draws for obs in draw]
 
         return cls(id=int(_id), draws=_draws)
 
-    def valid_game(self, key: dict[str, int] = KEY):
-        for draw_set in self.draws:
-            for draw in draw_set:
-                if not draw.valid_draw(KEY):
-                    return False
+    def valid_game(self, key: dict[str, int] = KEY) -> bool:
+        for draw in self.draws:
+            if not draw.valid_draw(key):
+                return False
         return True
+
+    def minimum_bag(self) -> dict[str, int]:
+        min_bag = {}
+        for draw in self.draws:
+            current = min_bag.get(draw.color, None)
+            if current is None or draw.count > current:
+                min_bag[draw.color] = draw.count
+        return min_bag
+
+    def power_bag(self) -> int:
+        min_bag = self.minimum_bag()
+        return prod(list(min_bag.values()))
 
 
 # Test
@@ -59,6 +74,9 @@ valid_test_games = [game.id for game in test_games if game.valid_game()]
 
 assert sum(valid_test_games) == 8
 
+power_test_games = [game.power_bag() for game in test_games]
+assert sum(power_test_games) == 2286
+
 # Actual
 with open("2023-12-02.txt") as file:
     raw_games_str = file.read()
@@ -66,3 +84,6 @@ with open("2023-12-02.txt") as file:
 raw_games = [Game.from_string(raw_game) for raw_game in raw_games_str.split("\n")]
 valid_raw_games = [game.id for game in raw_games if game.valid_game()]
 sum(valid_raw_games)
+
+power_raw_games = [game.power_bag() for game in raw_games]
+sum(power_raw_games)
