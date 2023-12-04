@@ -48,21 +48,28 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11"""
 sample_cards = [Card.from_string(card) for card in sample.split("\n")]
 assert sum(card.score for card in sample_cards) == 13
 
-sample_cards_dict = {card.id: card for card in sample_cards}
-cards_to_score = sample_cards
-number_of_cards = 0
-while True:
-    number_of_cards = number_of_cards + len(cards_to_score)
-    if not cards_to_score:
-        break
+cards = sample_cards
 
-    cards_to_score = [
-        sample_cards_dict[id]
-        for card in cards_to_score
-        for id in card.additional_cards_won(len(sample_cards))
-    ]
 
-assert number_of_cards == 30
+def count_cards(cards: list[Card]):
+    cards_dict = {card.id: card for card in cards}
+    cards_to_score = cards
+    number_of_cards = 0
+    while True:
+        number_of_cards = number_of_cards + len(cards_to_score)
+        if not cards_to_score:
+            break
+
+        cards_to_score = [
+            cards_dict[id]
+            for card in cards_to_score
+            for id in card.additional_cards_won(len(cards))
+        ]
+
+    return number_of_cards
+
+
+assert count_cards(sample_cards) == 30
 
 # Actual
 with open("2023-12-04.txt") as file:
@@ -71,18 +78,4 @@ with open("2023-12-04.txt") as file:
 actual_cards = [Card.from_string(card) for card in actual.split("\n")]
 sum(card.score for card in actual_cards)
 
-actual_cards_dict = {card.id: card for card in actual_cards}
-cards_to_score = actual_cards
-number_of_cards = 0
-while True:
-    number_of_cards = number_of_cards + len(cards_to_score)
-    if not cards_to_score:
-        break
-
-    cards_to_score = [
-        actual_cards_dict[id]
-        for card in cards_to_score
-        for id in card.additional_cards_won(len(actual_cards))
-    ]
-
-number_of_cards
+count_cards(actual_cards)
