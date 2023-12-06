@@ -48,6 +48,7 @@ Distance:   222   2031   1126   1225"""
 actual_races = prep_doc(actual)
 prod([len(race.winners) for race in actual_races])
 
+# Part 2
 actual_2 = re.sub(" ", "", actual)
 a_time, a_distance = [int(i) for i in re.sub("[^0-9\n]", "", actual_2).split("\n")]
 a_race = Race(a_time, a_distance)
