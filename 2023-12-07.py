@@ -6,6 +6,10 @@ Card = IntEnum(
     "Card", ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
 )
 
+JokerCard = IntEnum(
+    "JokerCard", ["J", "2", "3", "4", "5", "6", "7", "8", "9", "T", "Q", "K", "A"]
+)
+
 HandClassification = IntEnum(
     "HandClassification",
     [
@@ -22,12 +26,14 @@ HandClassification = IntEnum(
 
 @dataclass
 class Hand:
-    cards: list[Card]
+    cards: list[Card | JokerCard]
     bid: int
 
     @classmethod
-    def from_string(cls, string: str):
+    def from_string(cls, string: str, joker_deck: bool = False):
         _card_string, _bid = string.split(" ")
+        if joker_deck:
+            return cls([JokerCard[i] for i in _card_string], int(_bid))
         return cls([Card[i] for i in _card_string], int(_bid))
 
     @property
@@ -36,7 +42,18 @@ class Hand:
 
     @property
     def hand_classification(self):
-        counts = [count for _, count in self.grouped_cards]
+        if all(isinstance(card, JokerCard) for card in self.cards):
+            joker_count = len([card for card in self.cards if card == JokerCard.J])
+            counts = [
+                count for card, count in self.grouped_cards if card != JokerCard.J
+            ]
+            if counts:
+                counts[0] = counts[0] + joker_count
+            else:
+                # All joker hand
+                counts = [5]
+        else:
+            counts = [count for _, count in self.grouped_cards]
         if counts[0] == 5:
             return HandClassification["Five of a Kind"]
         if counts[0] == 4:
@@ -75,6 +92,15 @@ sample_hands = [Hand.from_string(line) for line in sample.split("\n")]
 sorted_sample_hands = sorted(sample_hands)
 assert sum((n + 1) * hand.bid for n, hand in enumerate(sorted_sample_hands)) == 6440
 
+sample_joker_hands = [
+    Hand.from_string(line, joker_deck=True) for line in sample.split("\n")
+]
+sorted_sample_joker_hands = sorted(sample_joker_hands)
+assert (
+    sum((n + 1) * hand.bid for n, hand in enumerate(sorted_sample_joker_hands)) == 5905
+)
+
+
 # Actual
 with open("2023-12-07.txt") as file:
     actual = file.read()
@@ -84,3 +110,8 @@ sorted_actual_hands = sorted(actual_hands)
 sum((n + 1) * hand.bid for n, hand in enumerate(sorted_actual_hands))
 
 # p2
+actual_joker_hands = [
+    Hand.from_string(line, joker_deck=True) for line in actual.split("\n")
+]
+sorted_actual_joker_hands = sorted(actual_joker_hands)
+sum((n + 1) * hand.bid for n, hand in enumerate(sorted_actual_joker_hands))
