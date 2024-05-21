@@ -47,7 +47,7 @@ def trace(doc: str):
         curr_x = copy.copy(x_step)
 
     # Get inside shape
-    polygon = [(x, y) for x, y in zip(x, y)]
+    polygon = [(x_pos - min(x), y_pos - min(y)) for x_pos, y_pos in zip(x, y)]
     for x_pos in range(line_len):
         for y_pos in range(lines):
             if is_point_in_path(x_pos, y_pos, polygon):
@@ -66,6 +66,7 @@ def is_point_in_path(x: int, y: int, poly: list[tuple[int, int]]) -> bool:
 
     Returns:
       True if the point is in the path or is a corner or on the boundary"""
+    # stolen from wiki, incorrectly classifies the bottom edges?
     num = len(poly)
     j = num - 1
     c = False
